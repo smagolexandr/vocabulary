@@ -2,6 +2,35 @@
 
 {% block body %}
     <div id="wrapper">
+        <nav>
+            <ul>
+                <li><a href="{{ path('homepage') }}">
+                        Home
+                    </a>
+                </li>
+                <li><a href="{{ path('wishlist') }}">
+                        Wishlist
+                    </a>
+                </li>
+                <li><a href="{{ path('add_word') }}">
+                        Add word
+                    </a>
+                </li>
+                <li>
+
+                </li>
+                {% if app.user %}
+                    {{ app.user.username }}
+                    {#<a href="{{ path('logout') }}">#}
+                        {#logout#}
+                    {#</a>#}
+                {% else %}
+                    <a href="{{ path('login') }}">
+                        Sign in
+                    </a>
+                {% endif %}
+            </ul>
+        </nav>
         <div id="container">
             <div id="welcome">
                 <h1><span>Welcome to</span>Vocabulary</h1>

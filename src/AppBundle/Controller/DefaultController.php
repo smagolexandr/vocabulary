@@ -4,17 +4,14 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Word;
 use AppBundle\Entity\User;
+use AppBundle\Form\WordType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-use Faker;
 
 class DefaultController extends Controller
 {
@@ -36,6 +33,47 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/word/add", name="add_word")
+     * @Template("AppBundle:Word:add.html.twig")
+     */
+    public function addWordAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $word = new Word;
+        $form = $this->createForm(WordType::class, $word)
+            ->add('Добавить', SubmitType::class, array(
+        'attr' => array('class' => 'btn btn-success center-btn')
+    ));;
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            //dump($form);
+            $em->persist($word);
+
+            if(!$word->getDe()){
+                $word->setDe($word->getWordTranslation($word->getEn(),'de'));
+            }
+            if(!$word->getUk()){
+                $word->setUk($word->getWordTranslation($word->getEn(),'uk'));
+            }
+            if(!$word->getRu()){
+                $word->setRu($word->getWordTranslation($word->getEn(),'ru'));
+            }
+            if(!$word->getPl()){
+                $word->setPl($word->getWordTranslation($word->getEn(),'pl'));
+            }
+            $word->setUsers($this->getUser());
+            $em->persist($word);
+            $em->flush();
+            return $this->redirectToRoute('homepage');
+        }
+
+
+        return ['form' => $form->createView()];
+    }
+
+
+    /**
      * @Route("/wishlist", name="wishlist")
      * @Template("default/index.html.twig")
      */
@@ -45,7 +83,6 @@ class DefaultController extends Controller
         $user = $this->getUser();
 
         $words = $user->getWishlist();
-        dump($words);
         $paginator = $this->get('knp_paginator');
         $pagination = $paginator->paginate($words, $request->query->getInt('page', 1), 25);
 
@@ -94,21 +131,19 @@ class DefaultController extends Controller
 // Get the response and close the channel.
                 $data = curl_exec($ch);
                 $xml = simplexml_load_string($data);
-                $tmp = $xml->text;
 
-                echo $tmp;
                 switch ($lang){
                     case "uk" :
-                        $obj->setUk($tmp);
+                        $obj->setUk($xml->text);
                         break;
                     case "ru":
-                        $obj->setRu($tmp);
+                        $obj->setRu($xml->text);
                         break;
                     case "de":
-                        $obj->setDe($tmp);
+                        $obj->setDe($xml->text);
                         break;
                     case "pl":
-                        $obj->setPl($tmp);
+                        $obj->setPl($xml->text);
                         break;
                 }
 
