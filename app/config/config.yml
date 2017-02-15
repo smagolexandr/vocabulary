@@ -10,7 +10,7 @@ parameters:
 
 framework:
     #esi:             ~
-    #translator:      { fallbacks: ["%locale%"] }
+    translator:      { fallbacks: ["%locale%"] }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"
@@ -68,3 +68,11 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+hautelook_alice:
+    db_drivers:
+        orm: ~          # Enable Doctrine ORM if is registered
+    locale: en_EN       # Locale to used for faker; must be a valid Faker locale otherwise will fallback to en_EN
+    seed: 1             # A seed to make sure faker generates data consistently across runs, set to null to disable
+    persist_once: true # Only persist objects once if multiple files are passed
+    loading_limit: 10    # Maximum number of time the loader will try to load the files passed
