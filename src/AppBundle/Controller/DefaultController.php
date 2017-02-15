@@ -3,9 +3,11 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Word;
+use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -40,14 +42,32 @@ class DefaultController extends Controller
     public function wishlistAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-        $words = $em -> getRepository('AppBundle:Word')->findAll();
+        $user = $this->getUser();
 
+        $words = $user->getWishlist();
+        dump($words);
         $paginator = $this->get('knp_paginator');
         $pagination = $paginator->paginate($words, $request->query->getInt('page', 1), 25);
 
         return [
             "words" => $pagination
         ];
+    }
+
+    /**
+     * @Route("/wishlist/add/{id}", name="add_word_to_wishlist")
+     */
+    public function addWishlistWordAction(Request $request, Word $word)
+    {
+        $em = $this->getDoctrine()->getManager();
+        /**
+         * @var User @user
+         */
+        $user = $this->getUser();
+        $user->addWishlist($word);
+        $em->persist($user);
+        $em->flush();
+        return new RedirectResponse($this->generateUrl("homepage"));
     }
 
     /**

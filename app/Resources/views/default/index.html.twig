@@ -9,6 +9,29 @@
 
             <div id="status">
                 <table>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            en
+                        </th>
+                        <th>
+                            uk
+                        </th>
+                        <th>
+                            de
+                        </th>
+                        <th>
+                            ru
+                        </th>
+                        <th>
+                            pl
+                        </th>
+                        <th>
+                            status
+                        </th>
+                    </tr>
                     {% for word in words %}
                         <tr>
                             <td>
@@ -21,10 +44,21 @@
                                 {{ word.uk }}
                             </td>
                             <td>
+                                {{ word.de }}
+                            </td>
+                            <td>
                                 {{ word.ru }}
                             </td>
                             <td>
                                 {{ word.pl }}
+                            </td>
+                            <td>
+                                {#{{ app.user.wishlist }}#}
+                                {% if word in app.user.wishlist %}
+                                    y
+                                {% else %}
+                                <a href="{{ path('add_word_to_wishlist', {'id':word.id}) }}">add</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -40,6 +74,7 @@
 
 {% block stylesheets %}
 <style>
+    table{text-align: center}
     body { background: #F5F5F5; font: 18px/1.5 sans-serif; }
     h1, h2 { line-height: 1.2; margin: 0 0 .5em; }
     h1 { font-size: 36px; }
